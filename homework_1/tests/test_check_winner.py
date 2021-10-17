@@ -1,11 +1,4 @@
 import pytest
-from game.tic_tac_game import TicTacGame
-
-
-@pytest.fixture
-def game():
-   game = TicTacGame()
-   return game
 
 @pytest.mark.parametrize(
     "board, win",
@@ -16,7 +9,7 @@ def game():
                 4: None, 5: None, 6: None,
                 7: None, 8: None, 9: None,
             },
-            True,   
+            True,
         ),
         (
             {
@@ -24,7 +17,7 @@ def game():
                 4: None, 5: None, 6: None,
                 7: None, 8: None, 9: None,
             },
-            False,     
+            False,
         ),
         (
             {
@@ -32,7 +25,7 @@ def game():
                 4: None, 5: "X", 6: None,
                 7: None, 8: None, 9: "X",
             },
-            True,   
+            True,
         ),
         (
             {
@@ -40,7 +33,7 @@ def game():
                 4: None, 5: None, 6: "O",
                 7: None, 8: None, 9: "O",
             },
-            True, 
+            True,
         ),
         (
             {
@@ -48,7 +41,7 @@ def game():
                 4: None, 5: "X", 6: "X",
                 7: "O", 8: "O", 9: "X",
             },
-            False, 
+            False,
         ),
     ],
 )

@@ -1,12 +1,5 @@
 import pytest
 from game.custom_exceptions import InputError
-from game.tic_tac_game import TicTacGame
-
-
-@pytest.fixture
-def game():
-   game = TicTacGame()
-   return game
 
 @pytest.mark.parametrize(
     "valid_input, return_value",
@@ -41,6 +34,5 @@ def test_should_return_valid_values(game, valid_input, return_value):
 )
 def test_should_cause_an_error(game, invalid_input):
     with pytest.raises(InputError) as exc:
-        game.validate_input(invalid_input) 
+        game.validate_input(invalid_input)
     assert exc.type == InputError
-    
