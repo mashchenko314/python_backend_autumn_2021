@@ -53,10 +53,11 @@ class TicTacGame:
             self.show_board()
             if counter % 2 == 0:
                 cell_number = self.make_move('X', self.player_1)
-                self.win, self.win_combination = self.check_winner(cell_number, 'X')
+                self.board[cell_number] = 'X'
             else: 
                 cell_number = self.make_move('O', self.player_2)
-                self.win, self.win_combination = self.check_winner(cell_number, 'O')
+                self.board[cell_number] = 'O'
+            self.win = self.check_winner()
             counter += 1
             if counter == 9:
                 self.show_board()
@@ -85,10 +86,9 @@ class TicTacGame:
         print("Привет, {}!".format(self.player_2))
         print("Ну что ж, начнем игру!")
 
-    def check_winner(self, cell_number, value):
-        self.board[cell_number] = value
+    def check_winner(self):
         win_combinations = ((1,2,3),(4,5,6),(7,8,9),(1,4,7),(2,5,8),(3,6,9),(1,5,9),(3,5,7))
         for each in win_combinations:
-            if self.board[each[0]] == self.board[each[1]] == self.board[each[2]] == value:
-                return True, each
-        return False, None
+            if self.board[each[0]] == self.board[each[1]] == self.board[each[2]] != None:
+                return True
+        return False
