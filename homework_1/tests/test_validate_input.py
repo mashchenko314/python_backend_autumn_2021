@@ -9,7 +9,7 @@ def game():
    return game
 
 @pytest.mark.parametrize(
-    "item, answer",
+    "valid_input, return_value",
     [
         ("1", 1),
         ("2", 2),
@@ -29,17 +29,18 @@ def game():
         (7, 7),
         (8, 8),
         (9, 9),
-        ("1.0", None),
-        ("", None),
-        (" ", None),
-        ("  ", None),
-        ("q", None),
-        ("qw", None),
-        ("qwe", None),
-        ("q1", None),
-        ("qw1", None),
-        ("qwe3", None),
     ],
 )
-def test_validate_input(game, item, answer):
-    assert game.validate_input(item) == answer
+def test_should_return_valid_values(game, valid_input, return_value):
+    assert game.validate_input(valid_input) == return_value
+
+
+@pytest.mark.parametrize(
+    "invalid_input",
+    ["1.0", "one", "   ", " ", "10", 11, "qwerty1"],
+)
+def test_should_cause_an_error(game, invalid_input):
+    with pytest.raises(InputError) as exc:
+        game.validate_input(invalid_input) 
+    assert exc.type == InputError
+    
