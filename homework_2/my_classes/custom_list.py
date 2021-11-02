@@ -20,8 +20,8 @@ class CustomList(list):
     def __radd__(self, other):
         buffer = []
         try:
-            for i,j in zip_longest(other, self, fillvalue=0):
-                buffer.append(i+j)
+            for i, j in zip_longest(other, self, fillvalue=0):
+                buffer.append(i + j)
         except TypeError:
             print('Невозможно выполнить сложение из-за различия типов слагаемых.')
             return None
@@ -41,19 +41,19 @@ class CustomList(list):
         return CustomList(buffer)
 
     def  __lt__(self, other): # x < y
-        return bool(sum(self) < sum(other))
+        return sum(self) < sum(other)
 
     def __le__(self, other): # x ≤ y
-        return bool(sum(self) <= sum(other))
+        return sum(self) <= sum(other)
 
     def __eq__(self, other): #x == y
-        return bool(sum(self) == sum(other))
+        return sum(self) == sum(other)
 
     def __ne__(self, other): #x != y
-        return bool(sum(self) != sum(other))
+        return sum(self) != sum(other)
 
     def __gt__(self, other): # x > y
-        return bool(sum(self) > sum(other))
+        return sum(self) > sum(other)
 
     def __ge__(self, other): # x ≥ y
-        return bool(sum(self) >= sum(other))
+        return sum(self) >= sum(other)

@@ -21,11 +21,11 @@ if __name__ == '__main__':
 
 
     inst = CustomClass()
-    inst.val 
+    inst.custom_val 
     inst.custom_x
     inst.custom_line()
     
-    inst.custom_val #ошибка
+    inst.val #ошибка
     inst.x  # ошибка
     inst.line() # ошибка
 

@@ -7,14 +7,18 @@ class CustomMeta(type):
     """
 
     def __new__(cls, name, bases, dct):
-        attrs = dict((name, 'custom_'+name)
-        for name, value in dct.items() if not name.startswith('__'))
+        attrs = dict((name, 'custom_' + name) for name, value in dct.items() if not name.startswith('__') and not name.endswith('__'))
         for key in dct.copy():
             if key in attrs:
                 value = dct.pop(key)
                 dct[attrs[key]] = value
-        return type.__new__(cls, name, bases, dct)
-
+        return super().__new__(cls, name, bases, dct)
+    
+    def __call__(cls, *args, **kwargs):
+        inst = super().__call__(*args, **kwargs)
+        for key in inst.__dict__.copy():
+            inst.__dict__['custom_' + key] = inst.__dict__.pop(key)
+        return inst
 
 
 class CustomClass(metaclass=CustomMeta):
