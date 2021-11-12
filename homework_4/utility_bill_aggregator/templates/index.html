@@ -1,0 +1,15 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h1>Агрегатор счетов</h1>
+
+  <p>Добро пожаловать в <em>Агрегатор счетов</em>. Храните все счета за коммунальные услуги в одном месте.</p>
+
+<h2>Данные</h2>
+
+  <ul>
+    <li><strong>Имя пользователя:</strong> {{ user_name }}</li>
+    <li><strong>Количество добавленных счетов:</strong> {{ num_accounts }}</li>
+  </ul>
+
+{% endblock %}
