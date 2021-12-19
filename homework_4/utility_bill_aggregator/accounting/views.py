@@ -1,7 +1,19 @@
 import json
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse, HttpResponseNotAllowed, HttpResponseNotFound
+from django.views.decorators.http import require_POST, require_GET
+from .models import Account, Service
+from rest_framework import viewsets
+from .serializers import AccountSerializer
+from rest_framework.response import Response
 
+class AccountViewSet(viewsets.ModelViewSet):
+    
+    queryset = Account.objects.all()
+    serializer_class = AccountSerializer
+
+
+    
 def index(request):
     user_name = 'Лена'
     num_accounts = 20
@@ -10,115 +22,89 @@ def index(request):
 
 def get_account_list(request):
     if request.method == 'GET':
-        accounts = {
-           1: {
-               'personal_account': 141820,
-               'mounth': 'october',
-               'year': '2021',
-               'type_accounts': 'elictricity',
-               'status': 'paid'
-            },
-            2: {
-                'personal_account': 14182043,
-                'mounth': 'october',
-                'year': '2021',
-                'type_accounts': 'water',
-                'status': 'paid'
-            },
-            3: {
-                'personal_account': 14182012,
-                'mounth': 'october',
-                'year': '2021',
-                'type_accounts': 'maintenance',
-                'status': 'paid'
-            }
-        }
-        return JsonResponse(accounts)
+       accounts = Account.objects.filter()
+       data = [
+           {
+               'id': account.id,
+               'personal_account': account.personal_account,
+               'month': account.month,
+               'year': account.year
+            } for account in accounts
+        ]
+       return JsonResponse({'accounts': data})
     else:
         return HttpResponseNotAllowed('GET')
 
 
 def get_account_detail(request, account_id):
     if request.method == 'GET':
-        account_details = {
-            1: {
-                'personal_account': 141820,
-                'mounth': 'october',
-                'year': '2021',
-                'type_accounts': 'elictricity',
-                'payment_amount': 2300,
-                'indications': '980',
-                'adress': 'Korolev, Frunze 1B, 45',
-                'electronic_receipt': None,
-                'status': 'paid'
-            },
-            2: {
-                'personal_account': 14182043,
-                'mounth': 'october',
-                'year': '2021',
-                'type_accounts': 'water',
-                'payment_amount': 2300,
-                'indications': 'cw-45, hw-90',
-                'adress': 'Korolev, Frunze 1B, 45',
-                'electronic_receipt': None,
-                'status': 'paid'
-            },
-            3: {
-                'personal_account': 14182012,
-                'mounth': 'october',
-                'year': '2021',
-                'type_accounts': 'maintenance',
-                'payment_amount': 2300,
-                'indications': None,
-                'adress': 'Korolev, Frunze 1B, 45',
-                'electronic_receipt': None,
-                'status': 'paid'
-            }
-        }
         try:
-            account_detail = account_details[account_id]
-        except KeyError:
+            account = Account.objects.get(id=account_id)
+            account_detail = {
+                'personal_account': account.personal_account,
+                'month': account.month,
+                'year': account.year,
+                'payment_amount': account.payment_amount,
+                'indications': account.indications,
+                'electronic_receipt_filename': account.electronic_receipt_filename,
+                'is_paid': account.is_paid,
+                'service_type': account.service_type.type
+            }
+        except Account.DoesNotExist:
             return HttpResponseNotFound()
         else:
             return JsonResponse(account_detail)
     else:
         return HttpResponseNotAllowed('GET')
 
+
 def add_account(request):
-    new_account = {
-        'personal_account': None,
-        'mounth': None,
-        'year': '2021',
-        'type_accounts': None,
-        'payment_amount': None,
-        'indications': None,
-        'adress': None,
-        'electronic_receipt': None,
-        'status': 'not paid'     
-    }
     if request.method == 'POST':
         try:
-            new_account['personal_account'] = request.POST['personal_account']
-            new_account['mounth'] = request.POST['mounth']
-            new_account['year'] = request.POST['year']
-            new_account['type_accounts'] = request.POST['type_accounts']
-            new_account['payment_amount'] = request.POST['payment_amount']
-            new_account['indications'] = request.POST['indications']
-            new_account['adress'] = request.POST['adress']
-            new_account['electronic_receipt']= request.FILES['electronic_receipt'].name
-            new_account['status'] = request.POST['status']
+            service = Service.objects.get(id=int(request.POST['service_id']))
+            new_account = Account.objects.create(
+               personal_account=request.POST['personal_account'],
+               month=request.POST['month'],
+               year=request.POST['year'],
+               payment_amount=request.POST['payment_amount'],
+               indications=request.POST['indications'],
+               electronic_receipt_filename=request.POST['electronic_receipt_filename'],
+               address=request.POST['address'],
+               is_paid=request.POST['is_paid'],
+               service_type=service,
+               )
+            new_account.save()
         except KeyError:
              return JsonResponse({'message': 'Required parameter not entered.'})
         else:
-            return JsonResponse({'message': 'New account successfully added.', 'account': new_account})
+            return JsonResponse({'message': 'New account successfully added.'})
     else:
         return HttpResponseNotAllowed('POST')
     
+@require_POST
+def edit_account(request, account_id):
+    try:
+        Account.objects.all().filter(id=account_id).update( 
+            is_paid=bool(request.POST['is_paid'])
+        )
+    except Account.DoesNotExist:
+        return HttpResponseNotFound()
+    except KeyError:
+             return JsonResponse({'message': 'Required parameter not entered.'})
+    else:
+        return JsonResponse({'message': 'The account was successfully edited.'})
+
+@require_GET
+def delete_account(request, account_id):
+    try:
+        account = Account.objects.get(id=account_id)
+        account.delete()
+    except Account.DoesNotExist:
+        return HttpResponseNotFound()
+    else:
+        return JsonResponse({'message': 'The account was successfully deleted.'})
 
 def add_account_type(request):
-    pass
-
-def edit_account(request, account_id):
     pass
 
 def search_accounts(request):
